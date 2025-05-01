@@ -49,8 +49,7 @@ ad_data$target <- ifelse(ad_data$target == "ad.", 1, 0)
 
 # Part 2: Descriptive statistic
 # Select numeric variables (excluding the binary target)
-numeric_vars <- sapply(ad_data, is.numeric)
-numeric_data <- ad_data[, numeric_vars & !names(ad_data) %in% c("X1558_bin")]
+numeric_data <- ad_data[, c(1, 2, 3)]
 
 # Calculate summary statistics with more metrics
 summary_stats <- sapply(numeric_data, function(x) {
@@ -62,11 +61,44 @@ summary_stats <- sapply(numeric_data, function(x) {
     Median = median(x),
     Q3 = quantile(x, 0.75),
     Max = max(x),
-    IQR = IQR(x),
-    Skewness = moments::skewness(x),
-    Kurtosis = moments::kurtosis(x),
-    NAs = sum(is.na(x)))
+    IQR = IQR(x))
 })
 # Transpose and round for better readability
 stats_table <- t(as.data.frame(summary_stats))
 round(stats_table, 2)
+
+# Number of targets
+table(ad_data$target)
+
+# Load required libraries
+library(ggplot2)
+
+# Part 3: Visualization
+
+# Barplot for target
+ggplot(ad_data, aes(x = factor(target), fill = factor(target))) +
+  geom_bar() +
+  scale_fill_manual(values = c("blue", "orange")) +
+  labs(title = "Barplot for Target", x = "Target (1=Ad, 0=Non-Ad)", y = "Count") +
+  theme_minimal()
+
+# Boxplot for height by target
+ggplot(ad_data, aes(x = factor(target), y = height, fill = factor(target))) +
+  geom_boxplot() +
+  scale_fill_manual(values = c("blue", "orange")) +
+  labs(title = "Boxplot of Height by Target", x = "Target", y = "Height") +
+  theme_minimal()
+
+# Boxplot for width by target
+ggplot(ad_data, aes(x = factor(target), y = width, fill = factor(target))) +
+  geom_boxplot() +
+  scale_fill_manual(values = c("blue", "orange")) +
+  labs(title = "Boxplot of Width by Target", x = "Target", y = "Width") +
+  theme_minimal()
+
+# Boxplot for ratio by target
+ggplot(ad_data, aes(x = factor(target), y = ratio, fill = factor(target))) +
+  geom_boxplot() +
+  scale_fill_manual(values = c("blue", "orange")) +
+  labs(title = "Boxplot of Ratio by Target", x = "Target", y = "Ratio") +
+  theme_minimal()
