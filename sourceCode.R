@@ -43,6 +43,16 @@ colnames(ad_data)[2] <- "width"
 colnames(ad_data)[3] <- "ratio"
 colnames(ad_data)[4] <- "target"
 
+# Recalculate Ratio 
+update_ratio <- function(df) {
+  df$ratio[is.na(df$ratio) & !is.na(df$height) & !is.na(df$width)] <- df$height[is.na(df$ratio) & !is.na(df$height) & !is.na(df$width)] / df$width[is.na(df$ratio) & !is.na(df$height) & !is.na(df$width)]
+  return(df)
+}
+
+# Use update_ratio to replace missing values
+add_data <- update_ratio(add_data)
+
+
 # Convert x1558 to binary
 ad_data$target <- ifelse(ad_data$target == "ad.", 1, 0)
 
@@ -74,6 +84,24 @@ table(ad_data$target)
 library(ggplot2)
 
 # Part 3: Visualization
+
+# Histogram for height
+ggplot(ad_data, aes(x = height)) +
+  geom_histogram(binwidth = 10, fill = "blue", color = "black", alpha = 0.7) +
+  labs(title = "Histogram of Height", x = "Height", y = "Frequency") +
+  theme_minimal()
+
+# Histogram for width
+ggplot(ad_data, aes(x = width)) +
+  geom_histogram(binwidth = 10, fill = "green", color = "black", alpha = 0.7) +
+  labs(title = "Histogram of Width", x = "Width", y = "Frequency") +
+  theme_minimal()
+
+# Histogram for ratio
+ggplot(ad_data, aes(x = ratio)) +
+  geom_histogram(binwidth = 0.5, fill = "purple", color = "black", alpha = 0.7) +
+  labs(title = "Histogram of Ratio", x = "Ratio", y = "Frequency") +
+  theme_minimal()
 
 # Barplot for target
 ggplot(ad_data, aes(x = factor(target), fill = factor(target))) +
