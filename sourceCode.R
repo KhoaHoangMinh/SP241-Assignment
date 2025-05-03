@@ -241,5 +241,66 @@ corrplot(cor_matrix, method = "circle", type = "upper",
          addCoef.col = "black", tl.col = "black", number.cex = 0.8,
          title = "Correlation Matrix", mar = c(0,0,1,0))
 
+# Part 5: Inferential Statistics
+# Reset seed
+set.seed(111)
 
+# Divide the dataset into training set and testing set
+# 70% - 30%
+sample_index <- sample(1:nrow(ad_data), size = 0.7 * nrow(ad_data))
+train_data <- ad_data[sample_index, ]
+test_data <- ad_data[-sample_index, ]
 
+# Logistic regression model with 'Height' and 'Width' 
+model_hw <- glm(target ~ height + width, data = train_data, family = binomial)
+summary(model_hw)
+
+# Logistic regression model with only 'Width'
+model_hw2 <- glm(target ~ width, data = train_data, family = binomial)
+summary(model_hw2)
+
+# Logistic regression model with 'ratio'
+model_ratio <- glm(target ~ ratio, data = train_data, family = binomial)
+summary(model_ratio)
+
+# Function to evaluate the model
+evaluate_model <- function(model, data, label) {
+  pred_prob <- predict(model, newdata = data, type = "response")
+  pred_class <- ifelse(pred_prob > 0.5, 1, 0)
+  
+  actual <- data$target
+  accuracy <- mean(pred_class == actual)
+  
+  cat(paste0(label, ":\n"))
+  cat("Accuracy: ", round(accuracy, 4), "\n")
+  cat("Confusion Matrix:\n")
+  print(table(Predicted = pred_class, Actual = actual))
+  cat("\n")
+}
+
+# Evaluate the model
+evaluate_model(model_hw2, test_data, "Model 1 (width)")
+evaluate_model(model_ratio, test_data, "Model 2 (ratio)")
+
+# Print the AIC of models
+cat("AIC Model 1 ( width): ", AIC(model_hw2), "\n")
+cat("AIC Model 2 (ratio): ", AIC(model_ratio), "\n")
+
+library(pROC)
+# Prediction on the test dataset
+prob_hw <- predict(model_hw2, newdata = test_data, type = "response")
+prob_ratio <- predict(model_ratio, newdata = test_data, type = "response")
+
+# Plot ROC
+roc_hw <- roc(test_data$target, prob_hw)
+roc_ratio <- roc(test_data$target, prob_ratio)
+
+# Plot comparison chart
+plot(roc_hw, col = "blue", lwd = 2, main = "ROC Curve Comparison")
+lines(roc_ratio, col = "red", lwd = 2)
+legend("bottomright", legend = c("Model 1: width", "Model 2: ratio"),
+       col = c("blue", "red"), lwd = 2)
+
+# Print AUC
+cat("AUC Model 1 (width): ", auc(roc_hw), "\n")
+cat("AUC Model 2 (ratio): ", auc(roc_ratio), "\n")
