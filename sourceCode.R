@@ -197,4 +197,49 @@ ggpairs(pair_data,
 
 # Part 4: Logistic regression model
 
+# Logistic regression model for height
+model_height <- glm(target ~ height, data = ad_data, family = "binomial")
+
+# Draw distribution chart between 'height' and 'target'
+# then draw logistic curve
+plot(ad_data$height, ad_data$target,
+     xlab = "Height", ylab = "Target",
+     main = "Logistic Regression: Target vs Height",
+     pch = 16, col = rgb(0, 0, 1, 0.3))  # Distribution chart
+
+curve(predict(model_height, newdata = data.frame(height = x), type = "response"),
+      add = TRUE, col = "red", lwd = 2)  # logistic curve
+
+# Logistic regression model for width
+model_width <- glm(target ~ width, data = ad_data, family = "binomial")
+
+plot(ad_data$width, ad_data$target,
+     xlab = "Width", ylab = "Target",
+     main = "Logistic Regression: Target vs Width",
+     pch = 16, col = rgb(0, 0, 1, 0.3)) 
+
+curve(predict(model_width, newdata = data.frame(width = x), type = "response"),
+      add = TRUE, col = "red", lwd = 2)
+
+# Logistic regression model for ratio
+model_ratio <- glm(target ~ ratio, data = ad_data, family = "binomial")
+
+plot(ad_data$ratio, ad_data$target,
+     xlab = "Ratio", ylab = "Target",
+     main = "Logistic Regression: Target vs Ratio",
+     pch = 16, col = rgb(0.7, 0, 0, 0.3))
+
+curve(predict(model_ratio, newdata = data.frame(ratio = x), type = "response"),
+      add = TRUE, col = "red", lwd = 2)
+
+# Calculate the correlation matrix between the continuous variables 'height', 'width', 'ratio'
+library(corrplot)
+cor_matrix <- cor(ad_data[, c("height", "width", "ratio")], use = "complete.obs")
+
+# Draw the correlation matrix plot
+corrplot(cor_matrix, method = "circle", type = "upper",
+         addCoef.col = "black", tl.col = "black", number.cex = 0.8,
+         title = "Correlation Matrix", mar = c(0,0,1,0))
+
+
 
