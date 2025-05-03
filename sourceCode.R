@@ -50,7 +50,7 @@ update_ratio <- function(df) {
 }
 
 # Use update_ratio to replace missing values
-add_data <- update_ratio(add_data)
+ad_data <- update_ratio(ad_data)
 
 
 # Convert x1558 to binary
@@ -77,6 +77,17 @@ summary_stats <- sapply(numeric_data, function(x) {
 stats_table <- t(as.data.frame(summary_stats))
 round(stats_table, 2)
 
+# Load necessary library
+library(gridExtra)
+
+# Create a PNG file to save the table
+png("C:/Users/hoang/Documents/HCMUT/242/XSTK/Assignment/datasettarget_table.png", width = 725, height = 150)
+
+# Render the table
+grid.table(stats_table)
+
+# Close the PNG device to save the file
+dev.off()
 # Number of targets
 table(ad_data$target)
 
@@ -130,3 +141,60 @@ ggplot(ad_data, aes(x = factor(target), y = ratio, fill = factor(target))) +
   scale_fill_manual(values = c("blue", "orange")) +
   labs(title = "Boxplot of Ratio by Target", x = "Target", y = "Ratio") +
   theme_minimal()
+
+# Set up 3 plots in a column layout
+par(mfrow = c(3, 1), mar = c(5, 5, 4, 2))
+
+# Strip Plot: Height vs Ad/NoAd
+stripchart(height ~ target,
+           data = ad_data,
+           horizontal = TRUE,
+           method = "jitter",
+           pch = 19,
+           col = rgb(0.2, 0.4, 0.8, 0.5),  # Semi-transparent blue
+           main = "Height Distribution by Ad Status",
+           ylab = "Ad Status (0 = Non-Ad, 1 = Ad)",
+           xlab = "Height")
+
+# Strip Plot: Width vs Ad/NoAd
+stripchart(width ~ target,
+           data = ad_data,
+           horizontal = TRUE,
+           method = "jitter",
+           pch = 19,
+           col = rgb(0.1, 0.7, 0.1, 0.5),  # Semi-transparent green
+           main = "Width Distribution by Ad Status",
+           ylab = "Ad Status (0 = Non-Ad, 1 = Ad)",
+           xlab = "Width")
+
+# Strip Plot: Ratio vs Ad/NoAd
+stripchart(ratio ~ target,
+           data = ad_data,
+           horizontal = TRUE,
+           method = "jitter",
+           pch = 19,
+           col = rgb(0.9, 0.2, 0.2, 0.5),  # Semi-transparent red
+           main = "Aspect Ratio Distribution by Ad Status",
+           ylab = "Ad Status (0 = Non-Ad, 1 = Ad)",
+           xlab = "Aspect Ratio")
+
+# Reset layout
+par(mfrow = c(1, 1))
+
+# Select the relevant columns
+pair_data <- ad_data[, c("height", "width", "ratio", "target")]
+
+# Convert target to factor for color grouping
+pair_data$target <- as.factor(pair_data$target)
+
+# Create pairwise plot
+ggpairs(pair_data,
+        aes(color = target, alpha = 0.6),
+        upper = list(continuous = "points"),
+        diag = list(continuous = "densityDiag"),
+        lower = list(continuous = "smooth")) +
+  theme_minimal()
+
+# Part 4: Logistic regression model
+
+
