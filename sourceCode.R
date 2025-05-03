@@ -2,7 +2,7 @@
 ad_data <- read.csv("~/HCMUT/242/XSTK/Assignment/dataset/add.csv")
 
 # Select the columns
-cols_to_show <- c(1:10, ncol(ad_data))
+cols_to_show <- c(1:15, ncol(ad_data))
 # Display first and last 10 rows
 rbind(head(ad_data[, cols_to_show], 10),
       tail(ad_data[, cols_to_show], 10))
@@ -20,6 +20,19 @@ ad_data$X0 <- as.numeric(ad_data$X0)
 ad_data$X1 <- as.numeric(ad_data$X1)
 ad_data$X2 <- as.numeric(ad_data$X2)
 
+# Rename columns
+colnames(ad_data)[1] <- "height"
+colnames(ad_data)[2] <- "width"
+colnames(ad_data)[3] <- "ratio"
+colnames(ad_data)[4] <- "target"
+
+# Convert target to binary
+ad_data$target <- ifelse(ad_data$target == "ad.", 1, 0)
+
+# Display first and last 10 rows
+rbind(head(ad_data, 10),
+      tail(ad_data, 10))
+
 # Count number of NA
 na_counts <- colSums(is.na(ad_data))
 # Percentage of NA for every col
@@ -32,16 +45,9 @@ print(na_summary)
 
 # Handle missing data by imputation
 # Replace missing values with median
-ad_data$X0[is.na(ad_data$X0)] <- median(ad_data$X0, na.rm = TRUE)
-ad_data$X1[is.na(ad_data$X1)] <- median(ad_data$X1, na.rm = TRUE)
-ad_data$X2[is.na(ad_data$X2)] <- median(ad_data$X2, na.rm = TRUE)
-
-
-# Rename columns
-colnames(ad_data)[1] <- "height"
-colnames(ad_data)[2] <- "width"
-colnames(ad_data)[3] <- "ratio"
-colnames(ad_data)[4] <- "target"
+ad_data$height[is.na(ad_data$height)] <- median(ad_data$height, na.rm = TRUE)
+ad_data$width[is.na(ad_data$width)] <- median(ad_data$width, na.rm = TRUE)
+ad_data$ratio[is.na(ad_data$ratio)] <- median(ad_data$ratio, na.rm = TRUE)
 
 # Recalculate Ratio 
 update_ratio <- function(df) {
@@ -51,11 +57,6 @@ update_ratio <- function(df) {
 
 # Use update_ratio to replace missing values
 ad_data <- update_ratio(ad_data)
-
-
-# Convert x1558 to binary
-ad_data$target <- ifelse(ad_data$target == "ad.", 1, 0)
-
 
 # Part 2: Descriptive statistic
 # Select numeric variables (excluding the binary target)
